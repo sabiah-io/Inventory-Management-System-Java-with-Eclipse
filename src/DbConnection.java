@@ -10,8 +10,8 @@ public class DbConnection {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/storedb", "root", "passwordincorrect");
 			return con;
-		}catch(Exception e1) {
-			JOptionPane.showMessageDialog(null, e1);
+		}catch(Exception ex) {
+			JOptionPane.showMessageDialog(null, ex);
 			return null;
 		}
 	}

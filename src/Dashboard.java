@@ -6,6 +6,8 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import java.awt.Color;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Font;
 import javax.swing.JButton;
 import javax.swing.ImageIcon;
@@ -18,6 +20,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
 
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
@@ -32,11 +35,16 @@ import javax.swing.JSpinner;
 import java.awt.SystemColor;
 import javax.swing.JComboBox;
 import com.toedter.calendar.JDateChooser;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
 
 public class Dashboard extends JFrame {
 
 	private JPanel contentPane;
 	private JTable goodsTable;
+	static HashMap<String, String> vendors = new HashMap<String, String>();
 
 	/**
 	 * Launch the application.
@@ -87,9 +95,9 @@ public class Dashboard extends JFrame {
 			
 			st.close();
 			
-		} catch (SQLException e) {
+		} catch (SQLException ex) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, ex);
 		}
 		
 	}
@@ -111,6 +119,10 @@ public class Dashboard extends JFrame {
 			
 			String id, name, phone, address, shop;
 			while(rs.next()) {
+				vendors.put("name", rs.getString(2));
+				vendors.put("phone", rs.getString(3));
+				vendors.put("address", rs.getString(4));
+				vendors.put("shop", rs.getString(5));
 				id=rs.getString(1);
 				name=rs.getString(2);
 				phone=rs.getString(3);
@@ -122,9 +134,9 @@ public class Dashboard extends JFrame {
 			
 			st.close();
 			
-		} catch (SQLException e) {
+		} catch (SQLException ex) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, ex);
 		}
 		
 	}
@@ -160,9 +172,9 @@ public class Dashboard extends JFrame {
 			
 			st.close();
 			
-		} catch (SQLException e) {
+		} catch (SQLException ex) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, ex);
 		}
 		
 	}
@@ -235,7 +247,6 @@ public class Dashboard extends JFrame {
 		btnGoods.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				tabbedPane.setSelectedIndex(0);
-//				loadGoods(con, goodsTable);
 			}
 		});
 		btnGoods.setHorizontalAlignment(SwingConstants.LEADING);
@@ -315,22 +326,6 @@ public class Dashboard extends JFrame {
 		btnVendors.setBounds(35, 247, 142, 31);
 		sidePanel.add(btnVendors);
 		
-		JButton btnBills = new JButton("Bills");
-		btnBills.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				tabbedPane.setSelectedIndex(2);
-			}
-		});
-		btnBills.setHorizontalAlignment(SwingConstants.LEADING);
-		btnBills.setIcon(new ImageIcon(Dashboard.class.getResource("/assets/money-bill-wave-free-icon-font.png")));
-		btnBills.setIconTextGap(20);
-		btnBills.setForeground(new Color(100, 149, 237));
-		btnBills.setFont(new Font("Poppins Medium", Font.PLAIN, 12));
-		btnBills.setBorder(null);
-		btnBills.setBackground(new Color(72, 61, 139));
-		btnBills.setBounds(35, 289, 142, 31);
-		sidePanel.add(btnBills);
-		
 		JButton btnLogout = new JButton("Logout");
 		btnLogout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -352,7 +347,22 @@ public class Dashboard extends JFrame {
 		
 		
 		JPanel goodsPane = new JPanel();
-		goodsPane.setBackground(new Color(255, 255, 255));
+		goodsPane.addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentShown(ComponentEvent e) {
+				loadGoods(con, goodsTable);
+			}
+			@Override
+			public void componentHidden(ComponentEvent e) {
+				goodsTable.setModel(new DefaultTableModel(
+						new Object[][] {
+						},
+						new String[] {
+						}
+					));
+			}
+		});
+		goodsPane.setBackground(SystemColor.control);
 		tabbedPane.addTab("New tab", null, goodsPane, null);
 		goodsPane.setLayout(null);
 		
@@ -370,7 +380,7 @@ public class Dashboard extends JFrame {
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBackground(new Color(255, 255, 255));
-		scrollPane.setBounds(0, 80, 662, 514);
+		scrollPane.setBounds(0, 79, 662, 463);
 		goodsPane.add(scrollPane);
 		
 		goodsTable = new JTable();
@@ -473,6 +483,21 @@ public class Dashboard extends JFrame {
 		billsPane.add(scrollPane_4);
 		
 		JPanel issuedgoodsPane = new JPanel();
+		issuedgoodsPane.addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentHidden(ComponentEvent e) {
+				issuedGoodsTable.setModel(new DefaultTableModel(
+						new Object[][] {
+						},
+						new String[] {
+						}
+					));
+			}
+			@Override
+			public void componentShown(ComponentEvent e) {
+				loadIssuedGoods(con, issuedGoodsTable);
+			}
+		});
 		issuedgoodsPane.setBackground(new Color(255, 255, 255));
 		tabbedPane.addTab("New tab", null, issuedgoodsPane, null);
 		issuedgoodsPane.setLayout(null);
@@ -500,6 +525,21 @@ public class Dashboard extends JFrame {
 		scrollPane_2.setViewportView(issuedGoodsTable);
 		
 		JPanel categoriesPane = new JPanel();
+		categoriesPane.addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentHidden(ComponentEvent e) {
+				categoriesTable.setModel(new DefaultTableModel(
+						new Object[][] {
+						},
+						new String[] {
+						}
+					));
+			}
+			@Override
+			public void componentShown(ComponentEvent e) {
+				loadCategories(con, categoriesTable);
+			}
+		});
 		categoriesPane.setBackground(SystemColor.control);
 		tabbedPane.addTab("New tab", null, categoriesPane, null);
 		categoriesPane.setLayout(null);
@@ -527,6 +567,21 @@ public class Dashboard extends JFrame {
 		scrollPane_3.setViewportView(categoriesTable);
 		
 		JPanel vendorsPane = new JPanel();
+		vendorsPane.addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentShown(ComponentEvent e) {
+				loadVendors(con, vendorsTable);
+			}
+			@Override
+			public void componentHidden(ComponentEvent e) {
+				vendorsTable.setModel(new DefaultTableModel(
+						new Object[][] {
+						},
+						new String[] {
+						}
+					));
+			}
+		});
 		vendorsPane.setBackground(SystemColor.control);
 		tabbedPane.addTab("New tab", null, vendorsPane, null);
 		vendorsPane.setLayout(null);
@@ -559,9 +614,44 @@ public class Dashboard extends JFrame {
 		));
 		scrollPane_1.setViewportView(vendorsTable);
 		
+	
 		
-		loadGoods(con, goodsTable);
-		loadVendors(con, vendorsTable);
+		JButton btnNewButton_2 = new JButton("New");
+		btnNewButton_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				NewGood good = new NewGood();
+				good.setVisible(true);
+			}
+		});
+		btnNewButton_2.setIcon(new ImageIcon(Dashboard.class.getResource("/assets/shopping-cart-add-free-icon-font.png")));
+		btnNewButton_2.setIconTextGap(10);
+		btnNewButton_2.setForeground(new Color(100, 149, 237));
+		btnNewButton_2.setFont(new Font("Poppins Medium", Font.PLAIN, 14));
+		btnNewButton_2.setBorder(null);
+		btnNewButton_2.setBackground(new Color(72, 61, 139));
+		btnNewButton_2.setBounds(552, 553, 100, 30);
+		goodsPane.add(btnNewButton_2);
+		
+		JButton btnGoodsLoad = new JButton("Load");
+		btnGoodsLoad.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				goodsTable.setModel(new DefaultTableModel(
+						new Object[][] {
+						},
+						new String[] {
+						}
+					));
+				loadGoods(con, goodsTable);
+			}
+		});
+		btnGoodsLoad.setIconTextGap(10);
+		btnGoodsLoad.setForeground(new Color(100, 149, 237));
+		btnGoodsLoad.setFont(new Font("Poppins Medium", Font.PLAIN, 14));
+		btnGoodsLoad.setBorder(null);
+		btnGoodsLoad.setBackground(new Color(72, 61, 139));
+		btnGoodsLoad.setBounds(438, 553, 100, 30);
+		goodsPane.add(btnGoodsLoad);
+
 		
 		JButton btnNewButton_1 = new JButton("New");
 		btnNewButton_1.addActionListener(new ActionListener() {
@@ -578,8 +668,25 @@ public class Dashboard extends JFrame {
 		btnNewButton_1.setBackground(new Color(72, 61, 139));
 		btnNewButton_1.setBounds(552, 546, 100, 30);
 		vendorsPane.add(btnNewButton_1);
-		loadIssuedGoods(con, issuedGoodsTable);
-		loadCategories(con, categoriesTable);
+		
+		JButton btnVendorLoad = new JButton("Load");
+		btnVendorLoad.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {vendorsTable.setModel(new DefaultTableModel(
+					new Object[][] {
+					},
+					new String[] {
+					}
+				));
+			loadVendors(con, vendorsTable);
+			}
+		});
+		btnVendorLoad.setIconTextGap(10);
+		btnVendorLoad.setForeground(new Color(100, 149, 237));
+		btnVendorLoad.setFont(new Font("Poppins Medium", Font.PLAIN, 14));
+		btnVendorLoad.setBorder(null);
+		btnVendorLoad.setBackground(new Color(72, 61, 139));
+		btnVendorLoad.setBounds(442, 546, 100, 30);
+		vendorsPane.add(btnVendorLoad);
 		
 		JButton btnNewButton = new JButton("New");
 		btnNewButton.addActionListener(new ActionListener() {
@@ -596,5 +703,25 @@ public class Dashboard extends JFrame {
 		btnNewButton.setBackground(new Color(72, 61, 139));
 		btnNewButton.setBounds(552, 547, 100, 30);
 		categoriesPane.add(btnNewButton);
+		
+		JButton btnCatLoad = new JButton("Load");
+		btnCatLoad.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				categoriesTable.setModel(new DefaultTableModel(
+						new Object[][] {
+						},
+						new String[] {
+						}
+					));
+				loadCategories(con, categoriesTable);
+			}
+		});
+		btnCatLoad.setIconTextGap(10);
+		btnCatLoad.setForeground(new Color(100, 149, 237));
+		btnCatLoad.setFont(new Font("Poppins Medium", Font.PLAIN, 14));
+		btnCatLoad.setBorder(null);
+		btnCatLoad.setBackground(new Color(72, 61, 139));
+		btnCatLoad.setBounds(442, 547, 100, 30);
+		categoriesPane.add(btnCatLoad);
 	}
 }

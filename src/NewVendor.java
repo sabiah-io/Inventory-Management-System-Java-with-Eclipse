@@ -64,6 +64,7 @@ public class NewVendor extends JFrame {
 		contentPane.add(lblNewLabel_1_4);
 		
 		nameField = new JTextField();
+		nameField.setFont(new Font("Poppins", Font.PLAIN, 12));
 		nameField.setColumns(10);
 		nameField.setBounds(23, 55, 190, 30);
 		contentPane.add(nameField);
@@ -75,11 +76,13 @@ public class NewVendor extends JFrame {
 		contentPane.add(lblNewLabel_1_4_1);
 		
 		phoneField = new JTextField();
+		phoneField.setFont(new Font("Poppins", Font.PLAIN, 12));
 		phoneField.setColumns(10);
 		phoneField.setBounds(295, 55, 190, 30);
 		contentPane.add(phoneField);
 		
 		addressField = new JTextField();
+		addressField.setFont(new Font("Poppins", Font.PLAIN, 12));
 		addressField.setColumns(10);
 		addressField.setBounds(23, 147, 190, 30);
 		contentPane.add(addressField);
@@ -97,6 +100,7 @@ public class NewVendor extends JFrame {
 		contentPane.add(lblNewLabel_1_4_3);
 		
 		shopField = new JTextField();
+		shopField.setFont(new Font("Poppins", Font.PLAIN, 12));
 		shopField.setColumns(10);
 		shopField.setBounds(295, 147, 190, 30);
 		contentPane.add(shopField);
